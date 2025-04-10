@@ -20,6 +20,26 @@ function App() {
             .catch((error) => console.error("Error fetching data:", error));
     }, []);
 
+    const [open, setOpen] = useState(false);
+
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const [todoAdded, setTodoAdded] = useState(false);
+
+    useEffect(() => {
+        if (todoAdded) {
+            setOpen(true);
+            setTodoAdded(false);
+        }
+    }, [todoAdded]);
+
+    const [lastAddedTask, setLastAddedTask] = useState("");
+
     const [priority, setPriority] = useState("medium");
     const [inputValue, setInputValue] = useState("");
 
@@ -35,7 +55,9 @@ function App() {
                 ...todos,
                 { task: inputValue, priority: priority, isDone: false },
             ]);
+            setLastAddedTask(inputValue);
             setInputValue("");
+            setTodoAdded(true);
         }
     };
     const handleToggleTodo = (index) => {
@@ -89,6 +111,24 @@ function App() {
                         todos={todos}
                         handleToggleTodo={handleToggleTodo}
                     />
+                    <Snackbar
+                        open={open}
+                        anchorOrigin={{
+                            horizontal: "center",
+                            vertical: "bottom",
+                        }}
+                        autoHideDuration={3000}
+                        onClose={handleClose}
+                    >
+                        <Alert
+                            onClose={handleClose}
+                            severity="success"
+                            variant="filled"
+                            sx={{ width: "100%" }}
+                        >
+                            "{lastAddedTask}" 할 일이 추가되었습니다.
+                        </Alert>
+                    </Snackbar>
                 </Container>
             </Box>
         </ThemeProvider>
